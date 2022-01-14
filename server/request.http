@@ -1,0 +1,34 @@
+@host = http://localhost:5000/api
+
+
+
+### Get Users
+GET {{host}}/users HTTP/1.1
+content-type: application/json
+
+
+### Create An User
+POST {{host}}/registration HTTP/1.1
+content-type: application/json
+
+{
+  "email": "user@mail.ru",
+  "password": "password"
+}
+
+
+
+### Login as a User
+POST {{host}}/login HTTP/1.1
+content-type: application/json
+
+{
+  "email": "user123@mail.ru",
+  "password": "password"
+}
+
+
+### Logout 
+POST {{host}}/logout HTTP/1.1
+content-type: application/json
+Cookie: refreshToken = 1
