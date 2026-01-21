@@ -1,13 +1,13 @@
-const Router = require("express").Router;
-const userController = require("../controllers/user-controller");
-const { body } = require("express-validator");
-const authMiddleware = require("../middleware/auth-midleware");
+import { Router } from "express";
+import userController from "../controllers/user-controller";
+import { body } from "express-validator";
+import authMiddleware from "../middleware/auth-middleware";
 
-const router = new Router();
+const router = Router();
 
 router.post(
   "/registration",
-  body("email").isEmail,
+  body("email").isEmail(),
   body("password").isLength({ min: 3, max: 32 }),
   userController.registration
 );
@@ -17,4 +17,4 @@ router.get("/activate/:link", userController.activate);
 router.get("/refresh", userController.refresh);
 router.get("/users", authMiddleware, userController.getUser);
 
-module.exports = router;
+export default router;

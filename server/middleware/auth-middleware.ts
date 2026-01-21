@@ -1,9 +1,19 @@
-const ApiError = require("../exceptions/api-error");
-const tokenService = require("../service/token-service");
+import { Request, Response, NextFunction } from "express";
+import ApiError from "../exceptions/api-error";
+import tokenService from "../service/token-service";
+import { JwtPayload } from "jsonwebtoken";
 
-module.exports = function name(req, res, next) {
+export interface AuthRequest extends Request {
+  user?: string | JwtPayload;
+}
+
+export default function (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    const authorizationHeader = req.headers?.authorization;
+    const authorizationHeader = req.headers.authorization;
 
     if (!authorizationHeader) {
       return next(ApiError.UnauthorizedError());
@@ -26,4 +36,4 @@ module.exports = function name(req, res, next) {
   } catch (error) {
     return next(ApiError.UnauthorizedError());
   }
-};
+}

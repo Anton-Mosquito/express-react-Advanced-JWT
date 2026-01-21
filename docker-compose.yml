@@ -1,0 +1,48 @@
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: appdb
+    volumes:
+      - db-data-prod:/var/lib/postgresql/data
+    restart: always
+
+  server:
+    build: ./server
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://dev:dev@db:5432/appdb
+      PORT: 5001
+    restart: always
+
+  # The client service builds the assets
+  client:
+    build: 
+      context: ./client
+      dockerfile: Dockerfile.prod
+    # We override the default CMD to just build and exit
+    command: npm run build
+    volumes:
+      # We share this volume with Nginx
+      - build_data:/usr/src/app/build
+
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf.prod:/etc/nginx/conf.d/default.conf
+      # Mount the build artifacts from the client volume
+      - build_data:/usr/share/nginx/html
+    depends_on:
+      - server
+      - client
+    restart: always
+
+volumes:
+  db-data-prod:
+  build_data:
