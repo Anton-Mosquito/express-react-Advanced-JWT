@@ -1,26 +1,28 @@
-const UserModel = require("../models/user-model");
-const bcrypt = require("bcrypt");
-const uuid = require("uuid");
-const mailService = require("./mail-service");
-const tokenService = require("../service/token-service");
-const UserDto = require("../dtos/user-dto");
-const ApiError = require("../exceptions/api-error");
+import prisma from "../db";
+import bcrypt from "bcrypt";
+import { v4 as uuidv4 } from "uuid";
+import mailService from "./mail-service";
+import tokenService from "../service/token-service";
+import UserDto from "../dtos/user-dto";
+import ApiError from "../exceptions/api-error";
 
 class UserService {
-  async registration(email, password) {
-    const candidate = await UserModel.findOne({ email });
+  async registration(email: string, password: string) {
+    const candidate = await prisma.user.findUnique({ where: { email } });
 
     if (candidate) {
       throw ApiError.BadRequest(`User with email ${email} have already exists`);
     }
 
     const hashPassword = await bcrypt.hash(password, 3);
-    const activationLink = uuid.v4();
+    const activationLink = uuidv4();
 
-    const user = await UserModel.create({
-      email,
-      password: hashPassword,
-      activationLink,
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: hashPassword,
+        activationLink,
+      },
     });
 
     await mailService.sendActivationMail(
@@ -39,19 +41,21 @@ class UserService {
     };
   }
 
-  async activate(activationLink) {
-    const user = await UserModel.findOne({ activationLink });
+  async activate(activationLink: string) {
+    const user = await prisma.user.findFirst({ where: { activationLink } });
 
     if (!user) {
       throw ApiError.BadRequest(`Unccorect activation link`);
     }
 
-    user.isActivated = true;
-    await user.save();
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { isActivated: true },
+    });
   }
 
-  async login(email, password) {
-    const user = await UserModel.findOne({ email });
+  async login(email: string, password: string) {
+    const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
       throw ApiError.BadRequest(`User with email ${email} can not be found`);
@@ -74,24 +78,27 @@ class UserService {
     };
   }
 
-  async logout(refreshToken) {
+  async logout(refreshToken: string) {
     const token = await tokenService.removeToken(refreshToken);
     return token;
   }
 
-  async refresh(refreshToken) {
+  async refresh(refreshToken: string) {
     if (!refreshToken) {
       throw ApiError.UnauthorizedError();
     }
 
-    const userData = tokenService.validateRefreshToken(refreshToken);
-    const tokenFromDb = tokenService.findToken(refreshToken);
+    const userData = tokenService.validateRefreshToken(refreshToken) as any;
+    const tokenFromDb = await tokenService.findToken(refreshToken);
 
     if (!userData || !tokenFromDb) {
       throw ApiError.UnauthorizedError();
     }
 
-    const user = await UserModel.findById(userData.id);
+    const user = await prisma.user.findUnique({ where: { id: userData.id } });
+    if (!user) {
+         throw ApiError.UnauthorizedError();
+    }
     const userDto = new UserDto(user); // ? id, email, isActivated
     const tokens = tokenService.generateTokens({ ...userDto });
 
@@ -104,9 +111,9 @@ class UserService {
   }
 
   async getAllUsers() {
-    const users = await UserModel.find();
+    const users = await prisma.user.findMany();
     return users;
   }
 }
 
-module.exports = new UserService();
+export default new UserService();

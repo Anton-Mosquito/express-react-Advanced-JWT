@@ -66,3 +66,7 @@ web_modules/
 .webpack/
 
 # Optional stylelint cache
+/generated/prisma
+
+# Generated Prisma Client
+prisma-client/

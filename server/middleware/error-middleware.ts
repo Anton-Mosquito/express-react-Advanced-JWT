@@ -1,6 +1,12 @@
-const ApiError = require("../exceptions/api-error");
+import { Request, Response, NextFunction } from "express";
+import ApiError from "../exceptions/api-error";
 
-module.exports = function (err, req, res, next) {
+export default function (
+  err: unknown,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   console.log(err);
 
   if (err instanceof ApiError) {
@@ -10,4 +16,4 @@ module.exports = function (err, req, res, next) {
   }
 
   return res.status(500).json({ message: "Unexpected error" });
-};
+}
