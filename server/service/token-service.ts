@@ -5,10 +5,12 @@ class TokenService {
   generateTokens(payload: any) {
     const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET!, {
       expiresIn: "30m",
+      algorithm: "HS256",
     });
 
     const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, {
       expiresIn: "30d",
+      algorithm: "HS256",
     });
 
     return {
