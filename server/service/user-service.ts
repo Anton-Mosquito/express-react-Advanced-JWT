@@ -5,6 +5,7 @@ import mailService from "./mail-service";
 import tokenService from "../service/token-service";
 import UserDto from "../dtos/user-dto";
 import ApiError from "../exceptions/api-error";
+import { env } from "../config/env";
 
 class UserService {
   async registration(email: string, password: string) {
@@ -27,7 +28,7 @@ class UserService {
 
     await mailService.sendActivationMail(
       email,
-      `${process.env.API_URL}/api/activate/${activationLink}`
+      `${env.API_URL}/api/activate/${activationLink}`,
     );
 
     const userDto = new UserDto(user); // ? id, email, isActivated
@@ -97,7 +98,7 @@ class UserService {
 
     const user = await prisma.user.findUnique({ where: { id: userData.id } });
     if (!user) {
-         throw ApiError.UnauthorizedError();
+      throw ApiError.UnauthorizedError();
     }
     const userDto = new UserDto(user); // ? id, email, isActivated
     const tokens = tokenService.generateTokens({ ...userDto });

@@ -1,17 +1,18 @@
 import nodemailer from "nodemailer";
+import { env } from "../config/env";
 
 class MailService {
   transporter: nodemailer.Transporter;
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      service: process.env.SMTP_SERVICE,
+      service: env.SMTP_SERVICE,
       auth: {
         type: "OAuth2",
-        user: process.env.GOOGLE_CLIENT,
-        clientId: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+        user: env.GOOGLE_CLIENT,
+        clientId: env.GOOGLE_CLIENT_ID,
+        clientSecret: env.GOOGLE_CLIENT_SECRET,
+        refreshToken: env.GOOGLE_REFRESH_TOKEN,
       },
     });
   }
@@ -19,9 +20,9 @@ class MailService {
   async sendActivationMail(to: string, link: string) {
     try {
       await this.transporter.sendMail({
-        from: process.env.GOOGLE_CLIENT,
+        from: env.GOOGLE_CLIENT,
         to,
-        subject: `Account activation ${process.env.API_URL || ""}`,
+        subject: `Account activation ${env.API_URL}`,
         text: `Activate: ${link}`,
         html: `
         <div>

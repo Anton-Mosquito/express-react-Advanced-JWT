@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import userService from "../service/user-service";
 import { validationResult } from "express-validator";
 import ApiError from "../exceptions/api-error";
+import { env } from "../config/env";
 
 class UserController {
   async registration(req: Request, res: Response, next: NextFunction) {
@@ -56,10 +57,10 @@ class UserController {
 
   async activate(req: Request, res: Response, next: NextFunction) {
     try {
-      const activationLink = req.params.link;
+      const activationLink = req.params.link as string;
       await userService.activate(activationLink);
 
-      return res.redirect(process.env.CLIENT_URL!);
+      return res.redirect(env.CLIENT_URL);
     } catch (error) {
       next(error);
     }

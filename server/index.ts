@@ -7,8 +7,9 @@ import errorMiddleware from "./middleware/error-middleware";
 import expressWs, { Application as WebSocketApplication } from "express-ws";
 import WebSocketController from "./controllers/websocket-controller";
 import { ExtendedWebSocket } from "./types/websocket.types";
+import { env } from "./config/env";
 
-const PORT = process.env.PORT || 5001;
+const PORT: number = env.PORT;
 
 const app = express();
 const wsInstance = expressWs(app);
@@ -22,7 +23,7 @@ wsApp.use(cookieParser());
 wsApp.use(
   cors({
     credentials: true,
-    origin: process.env.CLIENT_URL,
+    origin: env.CLIENT_URL,
   }),
 );
 wsApp.use("/api", router);
