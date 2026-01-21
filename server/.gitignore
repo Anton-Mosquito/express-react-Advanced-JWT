@@ -36,37 +36,57 @@ web_modules/
 
 
 
-# Output of 'npm pack'
-*.tgz
+### Node / TypeScript - common artifacts
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
 
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Dependency directories
+node_modules/
+
+# Build / output
+dist/
+build/
+out/
+coverage/
+.nyc_output/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Caches & temporary folders
+.cache/
+.parcel-cache/
+.temp/
+
+# Runtime Prisma caches (do not ignore committed generated client under src/generated)
+node_modules/.prisma/
+.prisma/
 
 # dotenv environment variable files
 .env
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
 .env.local
 
-# parcel-bundler cache (https://parceljs.org/)
-.cache
-.parcel-cache
+# OS files
+.DS_Store
+Thumbs.db
 
+# Editor/IDE
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
 
-# vuepress v2.x temp and cache directory
-.temp
+# Misc
+.eslintcache
+.stylelintcache
 
-# Serverless directories
-.serverless/
-
-# Stores VSCode versions used for testing VSCode extensions
-.vscode-test
-
-### Node Patch ###
-# Serverless Webpack directories
-.webpack/
-
-# Optional stylelint cache
-/generated/prisma
-
-# Generated Prisma Client
-prisma-client/
+# Ignore local SQLite DB files if present
+*.db
