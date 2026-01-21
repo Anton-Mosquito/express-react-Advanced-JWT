@@ -1,8 +1,8 @@
-import { NextFunction, Request, Response } from "express";
-import userService from "../service/user-service";
-import { validationResult } from "express-validator";
-import ApiError from "../exceptions/api-error";
-import { env } from "../config/env";
+import { NextFunction, Request, Response } from 'express';
+import userService from '../service/user-service';
+import { validationResult } from 'express-validator';
+import ApiError from '../exceptions/api-error';
+import { env } from '../config/env';
 
 class UserController {
   async registration(req: Request, res: Response, next: NextFunction) {
@@ -10,13 +10,13 @@ class UserController {
       const errors = validationResult(req);
 
       if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest("Validation error", errors.array()));
+        return next(ApiError.BadRequest('Validation error', errors.array()));
       }
 
       const { email, password } = req.body;
 
       const userData = await userService.registration(email, password);
-      res.cookie("refreshToken", userData.refreshToken, {
+      res.cookie('refreshToken', userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       }); //{ s : true} for https
@@ -33,7 +33,7 @@ class UserController {
 
       const userData = await userService.login(email, password);
 
-      res.cookie("refreshToken", userData.refreshToken, {
+      res.cookie('refreshToken', userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       }); //{ s : true} for https
@@ -48,7 +48,7 @@ class UserController {
     try {
       const { refreshToken } = req.cookies;
       const token = await userService.logout(refreshToken);
-      res.clearCookie("refreshToken");
+      res.clearCookie('refreshToken');
       return res.json(token);
     } catch (error) {
       next(error);
@@ -71,7 +71,7 @@ class UserController {
       const { refreshToken } = req.cookies;
       const userData = await userService.refresh(refreshToken);
 
-      res.cookie("refreshToken", userData.refreshToken, {
+      res.cookie('refreshToken', userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       }); //{ s : true} for https

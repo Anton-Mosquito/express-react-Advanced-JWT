@@ -14,13 +14,9 @@ export type Env = {
   JWT_REFRESH_SECRET: string;
 };
 
-const isProd = process.env.NODE_ENV === 'production';
-
 const env = cleanEnv(process.env, {
   PORT: num({ default: 5001 }),
-  // In production DATABASE_URL must be present; in development allow empty string to avoid
-  // failing startup when running without a DB (local frontend/dev flows).
-  DATABASE_URL: isProd ? str() : str({ default: '' }),
+  DATABASE_URL: str(),
   CLIENT_URL: str(),
   API_URL: str(),
   SMTP_SERVICE: str(),

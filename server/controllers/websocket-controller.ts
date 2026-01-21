@@ -1,5 +1,5 @@
-import { Server as WebSocketServer } from "ws";
-import { ExtendedWebSocket, WebSocketMessage } from "../types/websocket.types";
+import { Server as WebSocketServer } from 'ws';
+import { ExtendedWebSocket, WebSocketMessage } from '../types/websocket.types';
 
 class WebSocketController {
   private wss: WebSocketServer;
@@ -9,34 +9,34 @@ class WebSocketController {
   }
 
   handleConnection = (ws: ExtendedWebSocket): void => {
-    console.log("Connection established");
-    ws.send("You are successfully connected");
+    console.log('Connection established');
+    ws.send('You are successfully connected');
 
-    ws.on("message", (data: string) => {
+    ws.on('message', (data: string) => {
       try {
         const msg: WebSocketMessage = JSON.parse(data);
 
         switch (msg.method) {
-          case "connection":
+          case 'connection':
             this.connectionHandler(ws, msg);
             break;
-          case "draw":
+          case 'draw':
             this.broadcastMessage(ws, msg);
             break;
           default:
             console.warn(`Unknown method: ${msg.method}`);
         }
       } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
+        console.error('Error parsing WebSocket message:', error);
       }
     });
 
-    ws.on("close", () => {
-      console.log("Connection closed");
+    ws.on('close', () => {
+      console.log('Connection closed');
     });
 
-    ws.on("error", (error) => {
-      console.error("WebSocket error:", error);
+    ws.on('error', (error) => {
+      console.error('WebSocket error:', error);
     });
   };
 

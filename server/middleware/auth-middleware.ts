@@ -1,17 +1,13 @@
-import { Request, Response, NextFunction } from "express";
-import ApiError from "../exceptions/api-error";
-import tokenService from "../service/token-service";
-import { JwtPayload } from "jsonwebtoken";
+import { Request, Response, NextFunction } from 'express';
+import ApiError from '../exceptions/api-error';
+import tokenService from '../service/token-service';
+import { JwtPayload } from 'jsonwebtoken';
 
 export interface AuthRequest extends Request {
   user?: string | JwtPayload;
 }
 
-export default function (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-) {
+export default function (req: AuthRequest, res: Response, next: NextFunction) {
   try {
     const authorizationHeader = req.headers.authorization;
 
@@ -19,7 +15,7 @@ export default function (
       return next(ApiError.UnauthorizedError());
     }
 
-    const accessToken = authorizationHeader.split(" ")[1];
+    const accessToken = authorizationHeader.split(' ')[1];
 
     if (!accessToken) {
       return next(ApiError.UnauthorizedError());

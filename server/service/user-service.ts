@@ -1,11 +1,11 @@
-import prisma from "../db";
-import bcrypt from "bcrypt";
-import { v4 as uuidv4 } from "uuid";
-import mailService from "./mail-service";
-import tokenService from "../service/token-service";
-import UserDto from "../dtos/user-dto";
-import ApiError from "../exceptions/api-error";
-import { env } from "../config/env";
+import prisma from '../db';
+import bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
+import mailService from './mail-service';
+import tokenService from '../service/token-service';
+import UserDto from '../dtos/user-dto';
+import ApiError from '../exceptions/api-error';
+import { env } from '../config/env';
 
 class UserService {
   async registration(email: string, password: string) {

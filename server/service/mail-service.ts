@@ -1,5 +1,5 @@
-import nodemailer from "nodemailer";
-import { env } from "../config/env";
+import nodemailer from 'nodemailer';
+import { env } from '../config/env';
 
 class MailService {
   transporter: nodemailer.Transporter;
@@ -8,7 +8,7 @@ class MailService {
     this.transporter = nodemailer.createTransport({
       service: env.SMTP_SERVICE,
       auth: {
-        type: "OAuth2",
+        type: 'OAuth2',
         user: env.GOOGLE_CLIENT,
         clientId: env.GOOGLE_CLIENT_ID,
         clientSecret: env.GOOGLE_CLIENT_SECRET,
@@ -33,7 +33,7 @@ class MailService {
       });
     } catch (err) {
       // Log error but do not throw — registration flow should not fail because of email issues
-      console.error("Failed to send activation email:", err);
+      console.error('Failed to send activation email:', err);
     }
   }
 }
