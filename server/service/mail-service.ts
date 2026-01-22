@@ -32,7 +32,6 @@ class MailService {
       `,
       });
     } catch (err) {
-      // Log error but do not throw — registration flow should not fail because of email issues
       console.error('Failed to send activation email:', err);
     }
   }

@@ -1,35 +1,36 @@
 import { Request, Response, NextFunction } from 'express';
 import ApiError from '../exceptions/api-error.js';
 import tokenService from '../service/token-service.js';
-import { JwtPayload } from 'jsonwebtoken';
+
+export interface UserJwtPayload {
+  id: string;
+  email: string;
+  isActivated: boolean;
+}
 
 export interface AuthRequest extends Request {
-  user?: string | JwtPayload;
+  user?: UserJwtPayload;
 }
 
 export default function (req: AuthRequest, res: Response, next: NextFunction) {
-  try {
-    const authorizationHeader = req.headers.authorization;
+  const authorizationHeader = req.headers.authorization;
 
-    if (!authorizationHeader) {
-      return next(ApiError.UnauthorizedError());
-    }
-
-    const accessToken = authorizationHeader.split(' ')[1];
-
-    if (!accessToken) {
-      return next(ApiError.UnauthorizedError());
-    }
-
-    const userData = tokenService.validateAccessToken(accessToken);
-
-    if (!userData) {
-      return next(ApiError.UnauthorizedError());
-    }
-
-    req.user = userData;
-    next();
-  } catch (error) {
+  if (!authorizationHeader) {
     return next(ApiError.UnauthorizedError());
   }
+
+  const accessToken = authorizationHeader.split(' ')[1];
+
+  if (!accessToken) {
+    return next(ApiError.UnauthorizedError());
+  }
+
+  const userData = tokenService.validateAccessToken(accessToken);
+
+  if (!userData) {
+    return next(ApiError.UnauthorizedError());
+  }
+
+  req.user = userData as UserJwtPayload;
+  next();
 }

@@ -1,92 +1,77 @@
-import { RequestHandler } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import userService from '../service/user-service.js';
+import ApiError from '../exceptions/api-error.js';
 import { env } from '../config/env.js';
-import { ValidatedRequestHandler } from '../types/validated-request.js';
 import { RegistrationDto, LoginDto } from '../dtos/auth.schema.js';
 
 class UserController {
-  registration: ValidatedRequestHandler<RegistrationDto> = async (
-    req,
-    res,
-    next,
+  registration = async (
+    req: Request<unknown, unknown, RegistrationDto>,
+    res: Response,
   ) => {
-    try {
-      const { email, password }: RegistrationDto = req.body;
+    const { email, password } = req.body;
 
-      const userData = await userService.registration(email, password);
-      res.cookie('refreshToken', userData.refreshToken, {
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-      }); //{ s : true} for https
+    const userData = await userService.registration(email, password);
+    res.cookie('refreshToken', userData.refreshToken, {
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+    });
 
-      return res.json(userData);
-    } catch (error) {
-      next(error);
-    }
+    return res.json(userData);
   };
 
-  login: ValidatedRequestHandler<LoginDto> = async (req, res, next) => {
-    try {
-      const { email, password }: LoginDto = req.body;
+  login = async (req: Request<unknown, unknown, LoginDto>, res: Response) => {
+    const { email, password } = req.body;
 
-      const userData = await userService.login(email, password);
+    const userData = await userService.login(email, password);
 
-      res.cookie('refreshToken', userData.refreshToken, {
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-      }); //{ s : true} for https
+    res.cookie('refreshToken', userData.refreshToken, {
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+    });
 
-      return res.json(userData);
-    } catch (error) {
-      next(error);
-    }
+    return res.json(userData);
   };
 
-  logout: RequestHandler = async (req, res, next) => {
-    try {
-      const { refreshToken } = req.cookies;
-      const token = await userService.logout(refreshToken);
-      res.clearCookie('refreshToken');
-      return res.json(token);
-    } catch (error) {
-      next(error);
-    }
+  logout = async (
+    req: Request & { cookies: { refreshToken?: string } },
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const { refreshToken } = req.cookies;
+    if (!refreshToken) return next(ApiError.UnauthorizedError());
+    const token = await userService.logout(refreshToken);
+    res.clearCookie('refreshToken');
+    return res.json(token);
   };
 
-  activate: RequestHandler = async (req, res, next) => {
-    try {
-      const activationLink = req.params.link as string;
-      await userService.activate(activationLink);
+  activate = async (req: Request, res: Response) => {
+    const activationLink = req.params.link as string;
+    await userService.activate(activationLink);
 
-      return res.redirect(env.CLIENT_URL);
-    } catch (error) {
-      next(error);
-    }
+    return res.redirect(env.CLIENT_URL);
   };
 
-  refresh: RequestHandler = async (req, res, next) => {
-    try {
-      const { refreshToken } = req.cookies;
-      const userData = await userService.refresh(refreshToken);
+  refresh = async (
+    req: Request & { cookies: { refreshToken?: string } },
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const { refreshToken } = req.cookies;
+    if (!refreshToken) return next(ApiError.UnauthorizedError());
+    const userData = await userService.refresh(refreshToken);
 
-      res.cookie('refreshToken', userData.refreshToken, {
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-      }); //{ s : true} for https
+    res.cookie('refreshToken', userData.refreshToken, {
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+    }); //{ s : true} for https
 
-      return res.json(userData);
-    } catch (error) {
-      next(error);
-    }
+    return res.json(userData);
   };
 
-  getUser: RequestHandler = async (req, res, next) => {
-    try {
-      const users = await userService.getAllUsers();
-      return res.json(users);
-    } catch (error) {
-      next(error);
-    }
+  getUser = async (req: Request, res: Response) => {
+    const users = await userService.getAllUsers();
+    return res.json(users);
   };
 }
 
