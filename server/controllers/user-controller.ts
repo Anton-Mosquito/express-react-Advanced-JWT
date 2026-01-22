@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import userService from '../service/user-service';
+import userService from '../service/user-service.js';
 import { validationResult } from 'express-validator';
-import ApiError from '../exceptions/api-error';
-import { env } from '../config/env';
+import ApiError from '../exceptions/api-error.js';
+import { env } from '../config/env.js';
 
 class UserController {
   async registration(req: Request, res: Response, next: NextFunction) {

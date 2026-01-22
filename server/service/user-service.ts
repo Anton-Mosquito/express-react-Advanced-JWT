@@ -1,11 +1,11 @@
-import prisma from '../db';
+import prisma from '../db.js';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
-import mailService from './mail-service';
-import tokenService from '../service/token-service';
-import UserDto from '../dtos/user-dto';
-import ApiError from '../exceptions/api-error';
-import { env } from '../config/env';
+import mailService from './mail-service.js';
+import tokenService from '../service/token-service.js';
+import UserDto from '../dtos/user-dto.js';
+import ApiError from '../exceptions/api-error.js';
+import { env } from '../config/env.js';
 
 class UserService {
   async registration(email: string, password: string) {

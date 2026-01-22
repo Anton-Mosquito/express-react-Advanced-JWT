@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import prisma from '../db';
-import { env } from '../config/env';
+import prisma from '../db.js';
+import { env } from '../config/env.js';
 
 class TokenService {
   generateTokens(payload: any) {

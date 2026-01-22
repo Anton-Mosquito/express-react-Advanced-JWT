@@ -2,12 +2,12 @@ import 'dotenv/config';
 import express, { Application } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import router from './route/index';
-import errorMiddleware from './middleware/error-middleware';
+import router from './route/index.js';
+import errorMiddleware from './middleware/error-middleware.js';
 import expressWs, { Application as WebSocketApplication } from 'express-ws';
-import WebSocketController from './controllers/websocket-controller';
-import { ExtendedWebSocket } from './types/websocket.types';
-import { env } from './config/env';
+import WebSocketController from './controllers/websocket-controller.js';
+import { ExtendedWebSocket } from './types/websocket.types.js';
+import { env } from './config/env.js';
 
 const PORT: number = env.PORT;
 

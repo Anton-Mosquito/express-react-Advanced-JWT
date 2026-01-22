@@ -1,5 +1,5 @@
 import { Server as WebSocketServer } from 'ws';
-import { ExtendedWebSocket, WebSocketMessage } from '../types/websocket.types';
+import { ExtendedWebSocket, WebSocketMessage } from '../types/websocket.types.js';
 
 class WebSocketController {
   private wss: WebSocketServer;

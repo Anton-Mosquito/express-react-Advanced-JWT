@@ -9,7 +9,6 @@ export default defineConfig([
   {
     ignores: ['node_modules/**', 'dist/**', 'build/**', 'eslint.config.js'],
   },
-  // TypeScript files: use parser with project to enable type-aware rules
   {
     files: ['**/*.ts'],
     languageOptions: {
@@ -32,7 +31,6 @@ export default defineConfig([
       ...(tsRecommended.settings ?? {}),
     },
   },
-  // JavaScript files: don't use type-aware parserOptions.project
   {
     files: ['**/*.js'],
     plugins: {
