@@ -1,7 +1,9 @@
 import { Server as WebSocketServer } from 'ws';
 import {
   ExtendedWebSocket,
-  WebSocketMessage,
+  WsMessage,
+  WsMessageSchema,
+  ConnectionMessage,
 } from '../types/websocket.types.js';
 
 class WebSocketController {
@@ -17,17 +19,28 @@ class WebSocketController {
 
     ws.on('message', (data: string) => {
       try {
-        const msg: WebSocketMessage = JSON.parse(data);
+        const parsed: unknown = JSON.parse(data.toString());
+        const parseResult = WsMessageSchema.safeParse(parsed);
+        if (!parseResult.success) {
+          console.error('Invalid WS message received:', parseResult.error);
+          return;
+        }
+
+        const msg = parseResult.data as WsMessage;
 
         switch (msg.method) {
-          case 'connection':
-            this.connectionHandler(ws, msg);
+          case 'connection': {
+            // msg is narrowed to ConnectionMessage here by discriminated union
+            this.connectionHandler(ws, msg as ConnectionMessage);
             break;
-          case 'draw':
+          }
+          case 'draw': {
             this.broadcastMessage(ws, msg);
             break;
-          default:
-            console.warn(`Unknown method: ${msg.method}`);
+          }
+          default: {
+            console.warn(`Unknown method: ${(msg as any).method}`);
+          }
         }
       } catch (error) {
         console.error('Error parsing WebSocket message:', error);
@@ -45,19 +58,30 @@ class WebSocketController {
 
   private connectionHandler = (
     ws: ExtendedWebSocket,
-    msg: WebSocketMessage,
+    msg: ConnectionMessage,
   ): void => {
     ws.id = msg.id;
-    this.broadcastMessage(ws, msg);
+    ws.username = msg.username;
+
+    // Broadcast to all clients in the same room that a user connected
+    const broadcastPayload: ConnectionMessage = {
+      method: 'connection',
+      id: msg.id,
+      username: msg.username,
+    };
+
+    this.broadcastMessage(ws, broadcastPayload);
   };
 
-  private broadcastMessage = (
-    ws: ExtendedWebSocket,
-    msg: WebSocketMessage,
-  ): void => {
+  private broadcastMessage = (ws: ExtendedWebSocket, msg: WsMessage): void => {
+    const READY_STATE_OPEN = 1;
+
     this.wss.clients.forEach((client) => {
       const extendedClient = client as ExtendedWebSocket;
-      if (extendedClient.id === msg.id && client.readyState === client.OPEN) {
+      if (
+        extendedClient.id === msg.id &&
+        client.readyState === READY_STATE_OPEN
+      ) {
         client.send(JSON.stringify(msg));
       }
     });
