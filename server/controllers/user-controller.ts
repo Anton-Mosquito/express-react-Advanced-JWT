@@ -1,19 +1,17 @@
-import { NextFunction, Request, Response } from 'express';
+import { RequestHandler } from 'express';
 import userService from '../service/user-service.js';
-import { validationResult } from 'express-validator';
-import ApiError from '../exceptions/api-error.js';
 import { env } from '../config/env.js';
+import { ValidatedRequestHandler } from '../types/validated-request.js';
+import { RegistrationDto, LoginDto } from '../dtos/auth.schema.js';
 
 class UserController {
-  async registration(req: Request, res: Response, next: NextFunction) {
+  registration: ValidatedRequestHandler<RegistrationDto> = async (
+    req,
+    res,
+    next,
+  ) => {
     try {
-      const errors = validationResult(req);
-
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
-
-      const { email, password } = req.body;
+      const { email, password }: RegistrationDto = req.body;
 
       const userData = await userService.registration(email, password);
       res.cookie('refreshToken', userData.refreshToken, {
@@ -25,11 +23,11 @@ class UserController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async login(req: Request, res: Response, next: NextFunction) {
+  login: ValidatedRequestHandler<LoginDto> = async (req, res, next) => {
     try {
-      const { email, password } = req.body;
+      const { email, password }: LoginDto = req.body;
 
       const userData = await userService.login(email, password);
 
@@ -42,9 +40,9 @@ class UserController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async logout(req: Request, res: Response, next: NextFunction) {
+  logout: RequestHandler = async (req, res, next) => {
     try {
       const { refreshToken } = req.cookies;
       const token = await userService.logout(refreshToken);
@@ -53,9 +51,9 @@ class UserController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async activate(req: Request, res: Response, next: NextFunction) {
+  activate: RequestHandler = async (req, res, next) => {
     try {
       const activationLink = req.params.link as string;
       await userService.activate(activationLink);
@@ -64,9 +62,9 @@ class UserController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async refresh(req: Request, res: Response, next: NextFunction) {
+  refresh: RequestHandler = async (req, res, next) => {
     try {
       const { refreshToken } = req.cookies;
       const userData = await userService.refresh(refreshToken);
@@ -80,16 +78,16 @@ class UserController {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  async getUser(req: Request, res: Response, next: NextFunction) {
+  getUser: RequestHandler = async (req, res, next) => {
     try {
       const users = await userService.getAllUsers();
       return res.json(users);
     } catch (error) {
       next(error);
     }
-  }
+  };
 }
 
 export default new UserController();

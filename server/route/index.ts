@@ -1,17 +1,17 @@
 import { Router } from 'express';
 import userController from '../controllers/user-controller.js';
-import { body } from 'express-validator';
+import validateMiddleware from '../middleware/validate-middleware.js';
+import { registrationSchema, loginSchema } from '../dtos/auth.schema.js';
 import authMiddleware from '../middleware/auth-middleware.js';
 
 const router = Router();
 
 router.post(
   '/registration',
-  body('email').isEmail(),
-  body('password').isLength({ min: 3, max: 32 }),
+  validateMiddleware(registrationSchema),
   userController.registration,
 );
-router.post('/login', userController.login);
+router.post('/login', validateMiddleware(loginSchema), userController.login);
 router.post('/logout', userController.logout);
 router.get('/activate/:link', userController.activate);
 router.get('/refresh', userController.refresh);
